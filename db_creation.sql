@@ -67,3 +67,34 @@ SELECT * FROM KURSI WHERE CREATION_DATE BETWEEN '2023-01-01' AND '2025-12-31';
 
 SELECT * FROM STUDENT WHERE BIRTHDATE <= CURRENT_DATE - INTERVAL '25 YEARS';
 
+-- 1. Numeroni (funksioni count) sa kurse permbajne germen 'J' ne emer
+SELECT COUNT(*) AS TOTAL_COUNT FROM KURSI WHERE EMRI_KURSIT LIKE '%J%';
+
+-- 2. Nxirrni studentin qe ka maksimumin e pikeve.
+SELECT EMRI, PIKE AS MAX_POINTS FROM STUDENT
+WHERE PIKE = (SELECT MAX(PIKE) FROM STUDENT);
+
+--OR FOR ALL STUDENTS
+SELECT EMRI, PIKE FROM STUDENT ORDER BY PIKE DESC;
+
+-- 3. Listoni kurset qe kane me shume se 3 studente
+SELECT KURSI.EMRI_KURSIT, COUNT (STUDENT.ID) AS TOT_COUNT FROM KURSI
+                                                                   INNER JOIN STUDENT ON KURSI.ID=STUDENT.KURSI_ID
+GROUP BY KURSI.EMRI_KURSIT
+HAVING COUNT(STUDENT.ID)>3;
+
+-- 4. Shtoni nje tabele tjeter qe ta lidhni me foreign key te menaxhoni nje lidhje shume me shume midis 2 tabelave
+CREATE TABLE STUDENT_KURSI(
+                              STUDENT_ID INT,
+                              KURSI_ID INT,
+                              REGISTRATION_DT DATE,
+                              PRIMARY KEY (STUDENT_ID, KURSI_ID),
+                              FOREIGN KEY (STUDENT_ID) REFERENCES STUDENT(ID),
+                              FOREIGN KEY (KURSI_ID) REFERENCES KURSI (ID));
+
+-- 5. Listoni emer studenti dhe emer kursi per cdo student
+SELECT KURSI.EMRI_KURSIT, STUDENT.EMRI FROM STUDENT_KURSI
+                                                FULL JOIN STUDENT ON STUDENT_KURSI.STUDENT_ID = STUDENT.ID
+                                                FULL JOIN KURSI ON STUDENT_KURSI.KURSI_ID = KURSI.ID;
+
+
